@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run lint gate
+        run: make lint
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run typecheck gate
+        run: make typecheck
+
+  arch-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run architecture contracts
+        run: make arch
+
+  ci-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run CI contract tests
+        run: make ci-contracts
+
+  tests-core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run core test suite
+        run: make tests PYTEST_XML=pytest-core.xml
+      - name: Upload core pytest report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-core-report
+          path: pytest-core.xml
+          if-no-files-found: ignore
+
+  tests-full:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run full test suite
+        run: make tests-full PYTEST_XML=pytest-full.xml
+      - name: Upload full pytest report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-full-report
+          path: pytest-full.xml
+          if-no-files-found: ignore
+
+  package-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run package smoke gate
+        run: make package-smoke
+      - name: Upload built distributions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-packages
+          path: dist/*
+          if-no-files-found: ignore

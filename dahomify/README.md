@@ -50,6 +50,12 @@ You can re-run:
 - `dahomify show security --status open` – open security items  
 - `dahomify show smells --status open` – code smells
 
+Key docs:
+
+- `docs/ci_plan.md` - repository CI contract plus the full `ekra.app` CI/CD and DevOps blueprint
+- `SHARIKLY_COMMANDS.md` - practical frontend, backend, Docker, Dahomify, and deployment commands
+- `docs/CURSOR.md` - Cursor-specific agent workflow
+
 ---
 
 ## Use with an AI coding agent

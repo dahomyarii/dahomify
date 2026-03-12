@@ -1,0 +1,81 @@
+name: Python Publish
+
+on:
+  release:
+    types:
+      - published
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate tag matches package version
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PKG_VERSION="$(python - <<'PY'
+          import tomllib
+          from pathlib import Path
+          data = tomllib.loads(Path("pyproject.toml").read_text())
+          print(data["project"]["version"])
+          PY
+          )"
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "Tag version $TAG_VERSION does not match pyproject version $PKG_VERSION"
+            exit 1
+          fi
+
+      - name: Check if version exists on PyPI
+        id: version_check
+        shell: bash
+        run: |
+          RESULT="$(python - <<'PY'
+          import json
+          import tomllib
+          import urllib.error
+          import urllib.request
+          from pathlib import Path
+
+          data = tomllib.loads(Path("pyproject.toml").read_text())
+          version = data["project"]["version"]
+          exists = "false"
+
+          try:
+              with urllib.request.urlopen("https://pypi.org/pypi/desloppify/json", timeout=20) as resp:
+                  payload = json.loads(resp.read().decode("utf-8"))
+          except urllib.error.HTTPError as exc:
+              if exc.code != 404:
+                  raise
+          else:
+              releases = payload.get("releases", {})
+              exists = "true" if releases.get(version) else "false"
+
+          print(version)
+          print(exists)
+          PY
+          )"
+          PKG_VERSION="$(printf '%s\n' "$RESULT" | sed -n '1p')"
+          EXISTS="$(printf '%s\n' "$RESULT" | sed -n '2p')"
+          echo "PKG_VERSION=$PKG_VERSION" >> "$GITHUB_ENV"
+          echo "exists=$EXISTS" >> "$GITHUB_OUTPUT"
+
+      - name: Run packaging smoke gate
+        run: make package-smoke
+
+      - name: Publish to PyPI
+        if: steps.version_check.outputs.exists != 'true'
+        uses: pypa/gh-action-pypi-publish@release/v1

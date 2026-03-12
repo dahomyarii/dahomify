@@ -53,6 +53,7 @@ You can re-run:
 Key docs:
 
 - `docs/ci_plan.md` - repository CI contract plus the full `ekra.app` CI/CD and DevOps blueprint
+- `docs/ekra_app_delivery_guide.md` - full `ekra.app` repo strategy, testing, deployment, operations, and ownership guide
 - `SHARIKLY_COMMANDS.md` - practical frontend, backend, Docker, Dahomify, and deployment commands
 - `docs/CURSOR.md` - Cursor-specific agent workflow
 

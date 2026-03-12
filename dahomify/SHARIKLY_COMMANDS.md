@@ -3,6 +3,11 @@
 This runbook is the command companion for the `dahomify` CLI help text.
 Use it when setting up local development, CI validation, staging checks, or production release flows for `ekra.app`.
 
+Related docs:
+
+- `docs/ci_plan.md` - policy, workflow, and CI/CD summary
+- `docs/ekra_app_delivery_guide.md` - full end-to-end delivery and operating guide
+
 ## Core project entry points
 
 Frontend and project help:
@@ -220,3 +225,10 @@ docker compose logs
 - Do not promote to production from untested artifacts.
 - Keep CI, staging, and production as close as possible in runtime shape.
 - Re-run Dahomify after meaningful backend, frontend, or workflow changes.
+
+## Repo placement rule
+
+For `ekra.app`, the real CI/CD should live in the application repo.
+
+- keep actual workflows, tests, deploys, Docker files, and infra code with the app
+- keep Dahomify policy, templates, and reusable standards in `dahomify`

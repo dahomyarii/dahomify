@@ -101,6 +101,25 @@ Use the `Makefile` targets:
 
 ## Part 2: `ekra.app` Delivery Blueprint
 
+### Documentation Map
+
+Use these documents together:
+
+- `docs/ci_plan.md` for the policy and workflow summary
+- `docs/ekra_app_delivery_guide.md` for the full implementation guide
+- `SHARIKLY_COMMANDS.md` for practical commands and operational checks
+
+### Repo Placement Recommendation
+
+For `ekra.app`, the actual CI/CD should live in the `ekra.app` application repository, not only in `dahomify` and not in a separate orchestration-only repo by default.
+
+Use this split:
+
+- keep the real workflows, tests, deploy scripts, Docker assets, and infrastructure code with the application repo
+- keep the standards, policy, templates, and quality-gate guidance in `dahomify`
+
+Only split infrastructure into a separate repo if a platform-team model already exists and the separation is intentional.
+
 ### Mission
 
 Ship `ekra.app` safely with a repeatable pipeline that validates:
